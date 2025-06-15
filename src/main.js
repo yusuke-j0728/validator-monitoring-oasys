@@ -11,8 +11,7 @@ const CONFIG = {
   // Validator addresses to monitor
   VALIDATOR_ADDRESSES: [
     // Add your validator addresses here
-    // "0x1234567890abcdef1234567890abcdef12345678",
-    // "0xabcdef1234567890abcdef1234567890abcdef12"
+    "0xA716d824eabF5667A31E724cfC849f051b84A862"
   ],
   
   // Oasys RPC endpoint
