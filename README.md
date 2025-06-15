@@ -22,9 +22,9 @@ A Google Apps Script-based monitoring tool for Oasys blockchain validators with 
 ### 2. Local Development Setup
 
 ```bash
-# Clone or create the project
-git clone <repository-url>
-cd oasys-validator-monitor
+# Clone the project
+git clone https://github.com/yusuke-j0728/validator-monitoring-oasys.git
+cd validator-monitoring-oasys
 
 # Install dependencies
 npm install

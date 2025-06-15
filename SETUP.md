@@ -89,13 +89,13 @@ In GAS editor, go to Triggers tab and verify:
 
 ### Setup CI/CD
 
-1. **Create GitHub Repository**:
+1. **GitHub Repository**:
+   Repository: https://github.com/yusuke-j0728/validator-monitoring-oasys
+   
    ```bash
-   git add .
-   git commit -m "Initial commit"
-   git branch -M main
-   git remote add origin https://github.com/yourusername/oasys-validator-monitor.git
-   git push -u origin main
+   # Clone the repository
+   git clone https://github.com/yusuke-j0728/validator-monitoring-oasys.git
+   cd validator-monitoring-oasys
    ```
 
 2. **Configure GitHub Secrets**:
