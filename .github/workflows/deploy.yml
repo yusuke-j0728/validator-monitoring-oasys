@@ -1,0 +1,46 @@
+name: Deploy to Google Apps Script
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Setup Clasp credentials
+      run: |
+        echo '{"token":{"access_token":"${{ secrets.CLASP_ACCESS_TOKEN }}","refresh_token":"${{ secrets.CLASP_REFRESH_TOKEN }}","scope":"https://www.googleapis.com/auth/script.projects https://www.googleapis.com/auth/script.webapp.deploy https://www.googleapis.com/auth/logging.read https://www.googleapis.com/auth/service.management https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/script.deployments https://www.googleapis.com/auth/drive.metadata.readonly https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/script.projects.readonly","token_type":"Bearer","expiry_date":${{ secrets.CLASP_EXPIRY_DATE }}},"oauth2ClientSettings":{"clientId":"${{ secrets.CLASP_CLIENT_ID }}","clientSecret":"${{ secrets.CLASP_CLIENT_SECRET }}","redirectUri":"http://localhost"},"isLocalCreds":false}' > ~/.clasprc.json
+    
+    - name: Setup project config
+      run: |
+        echo '{"scriptId":"${{ secrets.GAS_SCRIPT_ID }}","rootDir":"./"}' > .clasp.json
+    
+    - name: Deploy to Google Apps Script
+      run: |
+        npx clasp push
+        echo "Deployment completed successfully!"
+    
+    - name: Notify deployment status
+      if: always()
+      run: |
+        if [ "${{ job.status }}" == "success" ]; then
+          echo "✅ Deployment successful"
+        else
+          echo "❌ Deployment failed"
+        fi

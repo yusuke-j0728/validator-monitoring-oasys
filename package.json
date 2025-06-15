@@ -1,0 +1,29 @@
+{
+  "name": "oasys-validator-monitor",
+  "version": "1.0.0",
+  "description": "Oasys Blockchain Validator Monitoring Tool using Google Apps Script",
+  "main": "src/main.js",
+  "scripts": {
+    "login": "clasp login",
+    "create": "clasp create --type standalone --title 'Oasys Validator Monitor'",
+    "push": "clasp push",
+    "pull": "clasp pull",
+    "deploy": "clasp deploy",
+    "open": "clasp open",
+    "logs": "clasp logs",
+    "versions": "clasp versions"
+  },
+  "keywords": [
+    "oasys",
+    "blockchain",
+    "validator",
+    "monitoring",
+    "google-apps-script"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@google/clasp": "^2.4.2",
+    "@types/google-apps-script": "^1.0.83"
+  }
+}
