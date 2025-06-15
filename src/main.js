@@ -8,9 +8,9 @@
  * Edit these values according to your setup
  */
 const CONFIG = {
-  // Validator addresses to monitor
+  // Validator addresses to monitor (use Owner addresses, not Operator addresses)
   VALIDATOR_ADDRESSES: [
-    // Add your validator addresses here
+    // Owner address for validator with operator 0x325671ee92C9A75B2196adf81954C6Bb5Dc1806E
     "0xA716d824eabF5667A31E724cfC849f051b84A862"
   ],
   
@@ -25,13 +25,13 @@ const CONFIG = {
   
   // Monitoring thresholds
   MIN_BLOCKS_PER_24H: 24,  // Minimum blocks to validate in 24 hours
-  MAX_BLOCK_DELAY_MINUTES: 30,  // Maximum minutes between blocks
+  MAX_BLOCK_DELAY_MINUTES: 120,  // Maximum minutes between blocks (2 hours - more realistic for validator rotation)
   
   // Check intervals
   CHECK_INTERVAL_MINUTES: 15,  // How often to run the monitor
   
   // Notification settings
-  SEND_SUCCESS_NOTIFICATIONS: false,  // Send notifications when all is well
+  SEND_SUCCESS_NOTIFICATIONS: true,  // Send notifications when all is well
   SEND_DAILY_SUMMARY: true  // Send daily summary
 };
 
