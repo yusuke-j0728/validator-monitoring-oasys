@@ -97,36 +97,137 @@ Add your validator addresses to the `VALIDATOR_ADDRESSES` array in `src/main.js`
 
 ## Monitoring Logic
 
-The monitor checks each validator for:
+### Data Collection
 
-1. **Validator Status**: Active/Inactive and Jailed status
-2. **Block Production**: Number of blocks validated in the last 24 hours
-3. **Recent Activity**: Time since last block production
-4. **Network Connectivity**: Ability to fetch data from RPC endpoints
+The monitor collects the following information for each validator:
 
-## Alert Levels
+#### 1. **Validator Status Information**
+- **Source**: Oasys Validator Contract (`0x0000000000000000000000000000000000001000`)
+- **Method**: RPC call `eth_call` with `getValidatorInfo(address)` function
+- **Data Retrieved**:
+  - `isActive`: Whether the validator is currently active
+  - `isJailed`: Whether the validator is in jailed state (penalized)
 
-- 🟢 **HEALTHY**: All checks pass
-- ⚠️ **WARNING**: Minor issues (low block production, delays)
-- 🚨 **CRITICAL**: Major issues (inactive, jailed validator)
-- 🔥 **ERROR**: Unable to fetch validator data
+#### 2. **Block Production History**
+- **Source**: Oasys blockchain blocks via RPC calls
+- **Method**: Sampling every 10th block over the last 24 hours for performance
+- **Data Retrieved**:
+  - Number of blocks validated in the last 24 hours
+  - Assumes average block time of 15 seconds
+
+#### 3. **Latest Block Activity**
+- **Source**: Recent blockchain blocks (last 1000 blocks)
+- **Method**: Reverse chronological search for validator's latest block
+- **Data Retrieved**:
+  - Last block number mined by the validator
+  - Timestamp of the last block
+  - Block hash
+
+### Alert Trigger Conditions
+
+#### 🟢 **HEALTHY** - All systems normal
+- ✅ Validator is active (`isActive = true`)
+- ✅ Validator is not jailed (`isJailed = false`)
+- ✅ Block production ≥ 24 blocks in 24 hours
+- ✅ Last block produced within 30 minutes
+
+#### ⚠️ **WARNING** - Minor issues detected
+- ✅ Validator is active and not jailed
+- ❌ **BUT** one or more of the following:
+  - Block production < 24 blocks in 24 hours
+  - No blocks produced in the last 30+ minutes
+  - No recent blocks found in the last 1000 blocks
+
+#### 🚨 **CRITICAL** - Major issues requiring immediate attention
+- ❌ Validator is inactive (`isActive = false`)
+- ❌ **OR** Validator is jailed (`isJailed = true`)
+
+#### 🔥 **ERROR** - System/Network issues
+- ❌ Unable to fetch validator data from RPC
+- ❌ Network connectivity issues
+- ❌ API call failures
+
+### Configuration Thresholds
+
+```javascript
+// Configurable in src/main.js
+MIN_BLOCKS_PER_24H: 24,          // Minimum blocks to validate in 24 hours
+MAX_BLOCK_DELAY_MINUTES: 30,     // Maximum minutes between blocks
+CHECK_INTERVAL_MINUTES: 15,      // Monitoring frequency
+```
 
 ## Slack Notifications
 
-The monitor sends different types of notifications:
+The monitor sends different types of notifications with detailed information:
 
-### Critical Alerts
-- Validator becomes inactive or jailed
-- Complete loss of block production
+### 🚨 Critical Alert Example
+```
+🚨 CRITICAL ALERT - 1 validator(s) have critical issues!
 
-### Warning Alerts  
-- Low block production
-- Delays in block production
+**0xA716d824...51b84A862**
+• Status: 🔴 Inactive 🔒 Jailed
+• Blocks (24h): 0
+• Issues: Validator is not active, Validator is jailed
 
-### Daily Summaries
-- Overall performance metrics
-- Individual validator statistics
-- 24-hour block production summary
+⚡ Immediate action required!
+```
+
+### ⚠️ Warning Alert Example
+```
+⚠️ WARNING - 1 validator(s) need attention
+
+**0xA716d824...51b84A862**
+• Blocks (24h): 18
+• Issues: Low block production: 18 blocks in 24h (min: 24), No blocks in 45 minutes (max: 30)
+```
+
+### 🔥 Error Alert Example
+```
+🔥 MONITOR ERROR - Unable to check 1 validator(s)
+
+**0xA716d824...51b84A862**
+• Error: Error fetching data: Network request failed
+
+🔧 Please check the monitoring system
+```
+
+### ✅ Daily Summary Example
+```
+📊 Daily Validator Summary - 2024/12/15
+
+📈 Status Overview
+• ✅ Healthy: 3
+• ⚠️ Warning: 1
+• 🚨 Critical: 0
+• 🔥 Error: 0
+
+📋 Validator Details
+✅ **0xA716d824...51b84A862**
+   • Blocks (24h): 96
+   • Last block: 12 minutes ago
+
+⚠️ **0x1234567890...abcdef12**
+   • Blocks (24h): 18
+   • Last block: 35 minutes ago
+   • Issues: Low block production: 18 blocks in 24h (min: 24)
+
+⚡ Performance Metrics
+• Total blocks (24h): 234
+• Average per validator: 58
+• Network health: 🟢 Good
+
+Generated at 09:00:00 JST
+```
+
+### Success Notification Example (Optional)
+```
+✅ All Clear - 4 validator(s) operating normally
+
+• 0xA716d824...51b84A862: 96 blocks/24h
+• 0x1234567890...abcdef12: 84 blocks/24h
+• 0xabcdef1234...90abcdef: 72 blocks/24h
+• 0x9876543210...fedcba98: 91 blocks/24h
+```
 
 ## Development Commands
 
